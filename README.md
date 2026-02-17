@@ -2,6 +2,8 @@
 
 A PyQt6 desktop application for validating and testing SimpleBGC gimbal controllers over serial or UDP. Provides real-time telemetry monitoring, manual gimbal control, motor health diagnostics, and an automated test suite for validating gimbal behavior.
 
+Works on **Linux**, **Windows**, and **macOS**.
+
 ## Features
 
 - **Dashboard** — Live telemetry display (IMU angles, motor power, battery voltage), motor ON/OFF status with flicker detection, system error diagnostics with fix suggestions, motor toggle control
@@ -14,17 +16,28 @@ A PyQt6 desktop application for validating and testing SimpleBGC gimbal controll
   - **Hold Stability** — Commands a position and measures deviation over time
 - **Log** — Full application log with level filtering, test run logs persisted to disk with CSV export
 
-## Prerequisites
+## Quick Start (Executable)
+
+If you have a pre-built executable, no installation is needed — just run it:
+
+- **Windows**: Double-click `GimbalBench.exe`
+- **Linux**: `./GimbalBench`
+- **macOS**: `./GimbalBench`
+
+To build the executable yourself, see [Building an Executable](#building-an-executable) below.
+
+## Installation (from source)
+
+### Prerequisites
 
 - **Python 3.12+**
+- **Git**
 - **SimpleBGC gimbal** connected via USB-serial (CH340/CH341) or UDP bridge
-
-## Installation
 
 ### 1. Clone the repository
 
 ```bash
-git clone --recurse-submodules <repo-url> GimbalBench
+git clone --recurse-submodules https://github.com/HIGHCATOFFICIAL/GimbalBench.git
 cd GimbalBench
 ```
 
@@ -36,23 +49,24 @@ If you already cloned without `--recurse-submodules`, pull the submodule separat
 git submodule update --init
 ```
 
-### 2. Install system dependencies (Ubuntu/Debian)
+### 2. Install Python dependencies
 
 ```bash
-sudo apt-get install python3 python3-pip libxcb-cursor0
+pip install -r requirements.txt
 ```
 
-`libxcb-cursor0` is required by the Qt6 XCB platform plugin on Linux.
+### 3. Platform-specific setup
 
-### 3. Install Python dependencies
+<details>
+<summary><b>Linux (Ubuntu/Debian)</b></summary>
+
+Install the Qt6 platform plugin dependency:
 
 ```bash
-pip3 install -r requirements.txt
+sudo apt-get install libxcb-cursor0
 ```
 
-### 4. Serial port permissions
-
-To access the USB-serial adapter without `sudo`, add your user to the `dialout` group:
+Add your user to the `dialout` group for serial port access:
 
 ```bash
 sudo usermod -aG dialout $USER
@@ -66,17 +80,69 @@ Log out and back in for the group change to take effect.
 sudo apt-get remove brltty
 ```
 
-## Running
+</details>
+
+<details>
+<summary><b>Windows</b></summary>
+
+Install the CH340/CH341 USB-serial driver if your system doesn't recognize the gimbal automatically:
+
+1. Download the driver from [the manufacturer's site](http://www.wch-ic.com/downloads/CH341SER_EXE.html)
+2. Run the installer and restart if prompted
+3. The gimbal should appear as a COM port (e.g., `COM3`) in Device Manager under "Ports (COM & LPT)"
+
+No additional permissions are needed on Windows.
+
+</details>
+
+<details>
+<summary><b>macOS</b></summary>
+
+Install the CH340/CH341 driver if needed:
 
 ```bash
-cd GimbalBench
-python3 main.py
+brew install --cask wch-ch34x-usb-serial-driver
 ```
+
+The gimbal will appear as `/dev/tty.usbserial-*` or `/dev/tty.usbmodem-*`.
+
+</details>
+
+### 4. Run
+
+```bash
+python main.py
+```
+
+On Linux you may need `python3` instead of `python`.
+
+## Building an Executable
+
+You can build a standalone executable that runs without Python installed:
+
+```bash
+pip install pyinstaller
+python build.py
+```
+
+The executable is created at:
+- **Linux/macOS**: `dist/GimbalBench`
+- **Windows**: `dist/GimbalBench.exe`
+
+To clean build artifacts and rebuild:
+
+```bash
+python build.py --clean
+```
+
+The executable is self-contained — it bundles Python, PyQt6, pyserial, and the sbgc library. Just copy it to any machine and run it.
+
+## Usage
 
 ### Connection
 
 1. Select **Serial** or **UDP** transport in the top connection panel
-2. For serial: select the port (typically `/dev/ttyUSB0`), baud rate `115200`, and click **Connect**
+2. For serial: select the port (`COM3` on Windows, `/dev/ttyUSB0` on Linux), baud rate `115200`, and click **Connect**
 3. For UDP: enter the bridge IP, bridge port, and PC port, then click **Connect**
 4. The LED indicator turns green when the gimbal is responding with telemetry
 
@@ -96,6 +162,7 @@ python3 main.py
 ```
 GimbalBench/
     main.py                          # Entry point
+    build.py                         # PyInstaller build script
     requirements.txt                 # Python dependencies
     Gimbal/                          # Git submodule - SimpleBGC protocol library
         sbgc/
@@ -132,9 +199,10 @@ GimbalBench/
 | Problem | Solution |
 |---------|----------|
 | `ModuleNotFoundError: No module named 'sbgc'` | Submodule not initialized. Run `git submodule update --init`. |
-| `ModuleNotFoundError: No module named 'PyQt6'` | Run `pip3 install -r requirements.txt`. |
-| `qt.qpa.plugin: Could not load the Qt platform plugin "xcb"` | Install `libxcb-cursor0`: `sudo apt-get install libxcb-cursor0`. |
-| Serial port not found / permission denied | Add user to `dialout` group: `sudo usermod -aG dialout $USER`, then log out/in. |
-| Serial port disappears after plugging in | Remove `brltty`: `sudo apt-get remove brltty`. |
+| `ModuleNotFoundError: No module named 'PyQt6'` | Run `pip install -r requirements.txt`. |
+| `qt.qpa.plugin: Could not load the Qt platform plugin "xcb"` | Linux only. Install `libxcb-cursor0`: `sudo apt-get install libxcb-cursor0`. |
+| Serial port not found (Linux) | Add user to `dialout` group: `sudo usermod -aG dialout $USER`, then log out/in. |
+| Serial port disappears (Linux) | Remove `brltty`: `sudo apt-get remove brltty`. |
+| COM port not showing (Windows) | Install the CH340/CH341 driver. Check Device Manager for the port. |
 | Gimbal connected but no telemetry | Check baud rate is `115200`. Try power-cycling the gimbal. |
 | Motors won't turn on | Check the Dashboard diagnostics panel for system errors and follow the suggested fixes. |

@@ -10,13 +10,19 @@ by checking (in order):
 import sys
 import os
 
-_HERE = os.path.dirname(os.path.abspath(__file__))
+# When frozen by PyInstaller, _MEIPASS points to the temp extraction directory
+# where bundled data files (including sbgc/) are unpacked.
+if getattr(sys, 'frozen', False):
+    _HERE = sys._MEIPASS
+else:
+    _HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def _find_sbgc_lib() -> str | None:
     """Locate the Gimbal project directory containing the sbgc package."""
     candidates = [
         os.environ.get("SBGC_LIB_PATH", ""),       # explicit override
+        _HERE,                                        # PyInstaller bundle (sbgc/ is at root)
         os.path.join(_HERE, "Gimbal"),                # git submodule
         os.path.join(_HERE, "..", "Gimbal"),           # sibling dir
     ]

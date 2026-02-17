@@ -1,0 +1,9 @@
+[13:57:13] Starting test suite: 4 test cases
+[13:57:13] [1/4] Hold Stability: Hold home (0°, 0°)
+[13:57:13]   Moving to pitch=0.0°, yaw=0.0°
+[13:57:23]   Result: FAIL (10.0s) Could not reach target position for stability test
+[13:57:23] [2/4] Hold Stability: Hold pitch -45°
+[13:57:23]   Moving to pitch=-45.0°
+[13:57:26] Suite aborted by user
+[13:57:26]   Result: FAIL (3.2s) Could not reach target position for stability test
+[13:57:26] Test suite aborted by user

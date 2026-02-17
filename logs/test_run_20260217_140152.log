@@ -1,0 +1,22 @@
+[14:01:52] Starting test suite: 4 test cases
+[14:01:52] [1/4] Hold Stability: Hold home (0°, 0°)
+[14:01:52]   Motors are OFF - sending motors_on command...
+[14:01:53]   Motors are now ON
+[14:01:53]   Moving to pitch=0.0°, yaw=0.0°
+[14:02:03]   Result: FAIL (11.2s) Could not reach target position for stability test
+[14:02:03] [2/4] Hold Stability: Hold pitch -45°
+[14:02:03]   Motors already on
+[14:02:03]   Moving to pitch=-45.0°
+[14:02:06]   Holding for 5.0s...
+[14:02:11]   Deviation: max=2.94°, mean=0.24°, stddev=0.56°
+[14:02:11]   Result: FAIL (7.2s) Hold unstable: max=2.94° > 2.0° (mean=0.24°)
+[14:02:11] [3/4] Hold Stability: Hold pitch -90°
+[14:02:11]   Motors already on
+[14:02:11]   Moving to pitch=-90.0°
+[14:02:13]   Holding for 5.0s...
+[14:02:18]   Deviation: max=2.61°, mean=0.41°, stddev=0.50°
+[14:02:18]   Result: FAIL (7.2s) Hold unstable: max=2.61° > 2.0° (mean=0.41°)
+[14:02:18] [4/4] Hold Stability: Hold yaw 45°
+[14:02:18]   Motors already on
+[14:02:18]   Moving to pitch=0.0°, yaw=45.0°
+[14:02:28]   Result: FAIL (10.0s) Could not reach target position for stability test

@@ -17,41 +17,23 @@ A PyQt6 desktop application for validating and testing SimpleBGC gimbal controll
 ## Prerequisites
 
 - **Python 3.12+**
-- **Gimbal project** (`sbgc` library) — Required. This provides all SimpleBGC protocol communication. See [Directory Layout](#directory-layout) below.
 - **SimpleBGC gimbal** connected via USB-serial (CH340/CH341) or UDP bridge
-
-## Directory Layout
-
-The tool expects the `Gimbal` project (containing the `sbgc` package) as a sibling directory:
-
-```
-parent_dir/
-    Gimbal/
-        sbgc/
-            client.py
-            transport.py
-            ...
-    GimbalBench/
-        main.py
-        requirements.txt
-        core/
-        ui/
-```
-
-Alternatively, set the `SBGC_LIB_PATH` environment variable to point to the Gimbal project:
-
-```bash
-export SBGC_LIB_PATH=/path/to/Gimbal
-```
 
 ## Installation
 
-### 1. Clone both repositories
+### 1. Clone the repository
 
 ```bash
-cd ~/projects   # or any parent directory
-git clone <gimbal-repo-url> Gimbal
-git clone <test-tool-repo-url> GimbalBench
+git clone --recurse-submodules <repo-url> GimbalBench
+cd GimbalBench
+```
+
+This clones GimbalBench along with the [Gimbal](https://github.com/HIGHCATOFFICIAL/Gimbal) submodule which provides the SimpleBGC protocol library (`sbgc`).
+
+If you already cloned without `--recurse-submodules`, pull the submodule separately:
+
+```bash
+git submodule update --init
 ```
 
 ### 2. Install system dependencies (Ubuntu/Debian)
@@ -65,7 +47,6 @@ sudo apt-get install python3 python3-pip libxcb-cursor0
 ### 3. Install Python dependencies
 
 ```bash
-cd GimbalBench
 pip3 install -r requirements.txt
 ```
 
@@ -116,6 +97,8 @@ python3 main.py
 GimbalBench/
     main.py                          # Entry point
     requirements.txt                 # Python dependencies
+    Gimbal/                          # Git submodule - SimpleBGC protocol library
+        sbgc/
     core/
         connection_manager.py        # Serial/UDP connection handling
         telemetry_worker.py          # Background telemetry polling (QThread)
@@ -148,7 +131,7 @@ GimbalBench/
 
 | Problem | Solution |
 |---------|----------|
-| `ModuleNotFoundError: No module named 'sbgc'` | The Gimbal project is not found. Place it as a sibling directory or set `SBGC_LIB_PATH`. |
+| `ModuleNotFoundError: No module named 'sbgc'` | Submodule not initialized. Run `git submodule update --init`. |
 | `ModuleNotFoundError: No module named 'PyQt6'` | Run `pip3 install -r requirements.txt`. |
 | `qt.qpa.plugin: Could not load the Qt platform plugin "xcb"` | Install `libxcb-cursor0`: `sudo apt-get install libxcb-cursor0`. |
 | Serial port not found / permission denied | Add user to `dialout` group: `sudo usermod -aG dialout $USER`, then log out/in. |

@@ -18,11 +18,19 @@ Works on **Linux**, **Windows**, and **macOS**.
 
 ## Quick Start (Executable)
 
-If you have a pre-built executable, no installation is needed — just run it:
+Download the latest release from the [Releases page](https://github.com/HIGHCATOFFICIAL/GimbalBench/releases). No Python installation needed.
 
-- **Windows**: Double-click `GimbalBench.exe`
-- **Linux**: `./GimbalBench`
-- **macOS**: `./GimbalBench`
+- **Windows**: Download `GimbalBench-windows.zip`, extract, and double-click `GimbalBench.exe`
+- **Linux**: Download `GimbalBench-linux.tar.gz`, then:
+  ```bash
+  tar xzf GimbalBench-linux.tar.gz
+  ./GimbalBench
+  ```
+- **macOS**: Download `GimbalBench-macos.tar.gz`, then:
+  ```bash
+  tar xzf GimbalBench-macos.tar.gz
+  ./GimbalBench
+  ```
 
 To build the executable yourself, see [Building an Executable](#building-an-executable) below.
 

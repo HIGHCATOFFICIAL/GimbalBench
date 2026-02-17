@@ -15,13 +15,10 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact: GimbalBench-linux
-            exe: dist/GimbalBench
           - os: windows-latest
             artifact: GimbalBench-windows
-            exe: dist/GimbalBench.exe
           - os: macos-latest
             artifact: GimbalBench-macos
-            exe: dist/GimbalBench
 
     runs-on: ${{ matrix.os }}
 
@@ -49,19 +46,28 @@ jobs:
       - name: Build executable
         run: python build.py
 
-      - name: Rename artifact (Linux)
+      - name: Package (Linux)
         if: runner.os == 'Linux'
-        run: mv dist/GimbalBench dist/GimbalBench-linux
+        run: |
+          chmod +x dist/GimbalBench
+          tar -czf dist/GimbalBench-linux.tar.gz -C dist GimbalBench
 
-      - name: Rename artifact (macOS)
+      - name: Package (macOS)
         if: runner.os == 'macOS'
-        run: mv dist/GimbalBench dist/GimbalBench-macos
+        run: |
+          chmod +x dist/GimbalBench
+          tar -czf dist/GimbalBench-macos.tar.gz -C dist GimbalBench
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: Compress-Archive -Path dist/GimbalBench.exe -DestinationPath dist/GimbalBench-windows.zip
+        shell: pwsh
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.exe }}*
+          path: dist/GimbalBench-*.*
 
   release:
     needs: build
@@ -82,6 +88,4 @@ jobs:
           token: ${{ secrets.SUBMODULE_PAT }}
           generate_release_notes: true
           files: |
-            artifacts/GimbalBench-linux/*
-            artifacts/GimbalBench-windows/*
-            artifacts/GimbalBench-macos/*
+            artifacts/**/*

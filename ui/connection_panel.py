@@ -1,5 +1,6 @@
 """Connection panel with Serial/UDP selector, port config, connect/disconnect."""
 import glob
+import sys
 from PyQt6.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout, QLabel,
                               QRadioButton, QComboBox, QLineEdit, QPushButton,
                               QCheckBox, QFrame, QButtonGroup)
@@ -8,7 +9,25 @@ from PyQt6.QtCore import pyqtSignal
 from ui.widgets.led_indicator import LedIndicator
 from ui.styles import SUBTEXT0, COLOR_WARN
 
-DEFAULT_PORT = "/dev/ttyUSB0"
+DEFAULT_PORT = "COM3" if sys.platform == "win32" else "/dev/ttyUSB0"
+
+
+def _scan_serial_ports() -> list[str]:
+    """Detect available serial ports on Linux, macOS, and Windows."""
+    ports: list[str] = []
+    if sys.platform == "win32":
+        # Windows: probe COM1-COM256
+        import serial.tools.list_ports
+        for info in sorted(serial.tools.list_ports.comports(), key=lambda p: p.device):
+            ports.append(info.device)
+    else:
+        # Linux / macOS
+        patterns = ["/dev/ttyUSB*", "/dev/ttyACM*"]
+        if sys.platform == "darwin":
+            patterns += ["/dev/tty.usbserial*", "/dev/tty.usbmodem*"]
+        for pattern in patterns:
+            ports.extend(sorted(glob.glob(pattern)))
+    return ports
 
 
 class ConnectionPanel(QWidget):
@@ -133,10 +152,11 @@ class ConnectionPanel(QWidget):
         current = self._port_combo.currentText()
         self._port_combo.clear()
         # Always include the default port first
+        seen = {DEFAULT_PORT}
         ports = [DEFAULT_PORT]
-        # Add any other detected ports
-        for p in sorted(glob.glob("/dev/ttyUSB*") + glob.glob("/dev/ttyACM*")):
-            if p not in ports:
+        for p in _scan_serial_ports():
+            if p not in seen:
+                seen.add(p)
                 ports.append(p)
         for p in ports:
             self._port_combo.addItem(p)

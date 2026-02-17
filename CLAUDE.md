@@ -115,6 +115,22 @@ Automatic tests (Recovery, Sweep, Stability) call `_ensure_motors_on()` before r
 2. Add it in `ui/main_window.py` — instantiate and `addTab()`
 3. If it needs telemetry, add a forwarding call in `MainWindow._on_telemetry()`
 
+## Git workflow
+
+**Always work on a feature branch** — never commit directly to `main`.
+
+```bash
+git checkout -b feature/my-feature
+# ... make changes ...
+git add <files>
+git commit -m "Description of changes"
+git push origin feature/my-feature
+```
+
+Then open a pull request on GitHub. The project maintainer reviews and merges PRs into `main`, then tags a version (`git tag v1.x.x && git push origin v1.x.x`) which triggers the CI/CD release pipeline that builds executables for Linux, Windows, and macOS.
+
+**Do not** push directly to `main`, create tags, or trigger releases.
+
 ## System dependencies (Ubuntu/Debian)
 
 ```bash
